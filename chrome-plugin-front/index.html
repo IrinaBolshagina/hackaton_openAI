@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart CV Sender</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            padding: 20px;
+            width: 300px;
+            height: 400px; /* Increased height */
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Center vertically */
+            align-items: center; /* Center horizontally */
+        }
+        h1 {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        .custom-file-upload {
+            display: inline-block;
+            padding: 6px 12px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #f8f9fa; /* Light background */
+        }
+        .custom-file-upload:hover {
+            background-color: #e2e6ea; /* Slightly darker on hover */
+        }
+        input[type="file"] {
+            display: none; /* Hide the default file input */
+        }
+        .icon {
+            width: 80px; /* Set width for the icon */
+            height: auto; /* Maintain aspect ratio */
+            margin-bottom: 20px; /* Space between icon and title */
+        }
+    </style>
+</head>
+<body>
+<div class="container text-center">
+    <div class="d-flex justify-content-center mb-3"> <!-- Flexbox for centering -->
+        <img src="smoke.png" alt="Magic Icon" class="icon"/>
+    </div>
+    <h1>Smart CV Sender</h1>
+    <div class="form-group">
+        <label class="custom-file-upload">
+            <input type="file" id="cvFile" accept=".pdf"/>
+            Choose Current CV
+        </label>
+    </div>
+    <button id="sendButton" class="btn btn-primary btn-block">Send Application</button>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
