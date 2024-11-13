@@ -1,0 +1,9 @@
+.env
+.venv
+env
+.vscode
+__pycache__
+storage*/
+credentials.json
+token.json
+*.pdf
