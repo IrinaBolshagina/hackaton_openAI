@@ -7,7 +7,11 @@ from llm import Assistant
 from os import getenv
 from dotenv import load_dotenv
 import time
-
+import smtplib
+from email.message import EmailMessage
+from email.mime.base import MIMEBase
+from email import encoders
+import mimetypes
 
 load_dotenv()
 app = Flask(__name__)
@@ -36,7 +40,7 @@ def submit_pdf():
         filename = f"CV_{timestamp}.pdf"
         file.save(os.path.join("./data", filename))
         assistant.upload_file(f"./data/{filename}")
-
+#         send_email_with_attachment("dariarch@gmail.com", "Hello, Daria", f"./data/{filename}", )
         return jsonify({"status": "success", "message": "PDF received", "file_path": file.filename})
     else:
         return jsonify({"status": "error", "message": "Invalid file type"})
@@ -53,3 +57,28 @@ def submit_json():
     # Process the received JSON data
     return jsonify({"status": "success", "message": "JSON received", "data": data})
 
+def send_email_with_attachment(to_email, text, file_path, subject="CV for job offer"):
+    # Set up the email
+    msg = EmailMessage()
+    msg['From'] = 'grigorjan.bigmen@gmail.com'  # Replace with your email
+    msg['To'] = to_email
+    msg['Subject'] = subject
+    msg.set_content(text)
+
+    # Attach the file
+    ctype, encoding = mimetypes.guess_type(file_path)
+    if ctype is None or encoding is not None:
+        ctype = 'application/octet-stream'
+    maintype, subtype = ctype.split('/', 1)
+
+    with open(file_path, 'rb') as file:
+        file_data = file.read()
+        file_name = file_path.split('/')[-1]
+        msg.add_attachment(file_data, maintype=maintype, subtype=subtype, filename=file_name)
+
+    # Send the email
+    with smtplib.SMTP('smtp.gmail.com', 587) as server:  # Replace with your SMTP server and port
+        server.starttls()
+        server.login('grigorjan.bigmen@gmail.com', getenv("GMAIL_KEY"))  # Replace with your login credentials
+        server.send_message(msg)
+    print(f'Email sent to {to_email} with attachment {file_name}')
