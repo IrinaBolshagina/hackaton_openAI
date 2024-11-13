@@ -20,7 +20,7 @@ class Assistant:
             file=open(file_path, "rb"), purpose="assistants"
         )
 
-    def new_thread(self, instruction_for_file):
+    def new_thread_with_file(self, instruction_for_file):
         '''
         Create a new thread with intruction what to do with the file and attach the file to the instruction_for_file.
         '''
@@ -35,6 +35,18 @@ class Assistant:
                     ],
                 }
             ]
+        )
+        return thread
+    
+
+    def add_message_to_thread(self, thread, message):
+        '''
+        add a new message to the thread.
+        '''
+        self.client.beta.threads.messages.create(
+            thread_id=thread.id, 
+            role="user",
+            content=message
         )
         return thread
 
@@ -64,9 +76,10 @@ class Assistant:
         '''
         Chat with the assistant for test purposes.
         '''
+        thread = self.new_thread_with_file("this is a CV to work with")
         while True:
             instruction_for_file = input("Enter a instruction_for_file or 'q' to exit: ")
             if instruction_for_file == 'q':
                 break
-            thread = self.new_thread(instruction_for_file)
+            self.add_message_to_thread(thread, instruction_for_file)
             self.run_thread(thread)
