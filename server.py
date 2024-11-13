@@ -20,6 +20,7 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 uploaded_file = None
 
+
 sample_json = {
     "title": "Sample PDF Document",
     "sections": [
@@ -44,7 +45,11 @@ assistant = Assistant(
         api_key=getenv("OPENAI_API_KEY"),
         assistant_name="CV assistant",
         instructions='''
-            You are an expert HR. Use job offer description to create a cover letter, edit a CV.
+            You are an expert HR. Use job offer description to create a cover email, edit a CV.
+          ''',
+        letter_prompt='''
+            Create a cover email tailored to the job description, highlighting the most relevant qualifications from the CV proveded in pdf file.
+            IMPORTANT: Respond only with finished cover email text, Take name of sender from CV and dont include subject or recipient email. Email should be under 130 words.
           ''',
         model="gpt-4o",
         tools=[{"type": "file_search"}],
@@ -61,9 +66,9 @@ def submit_pdf():
         timestamp = int(time.time())
         filename = f"CV_{timestamp}.pdf"
         file.save(os.path.join("./data", filename))
-        assistant.upload_file(f"./data/{filename}")
-#         create_pdf_from_json(sample_json)
-#         send_email_with_attachment("dariarch@gmail.com", "Hello, Daria", "new_cv.pdf")
+        assistant.filepath = f"./data/{filename}"
+        assistant.upload_file(assistant.filepath)
+
         return jsonify({"status": "success", "message": "PDF received", "file_path": file.filename})
     else:
         return jsonify({"status": "error", "message": "Invalid file type"})
@@ -75,7 +80,11 @@ def submit_json():
     expertises = data.get('expertises')
     email = data.get('email')
 
-    assistant.chat()
+    # create_pdf_from_json(sample_json)
+
+    response = assistant.generate_letter(description, expertises)
+    print(response)
+    send_email_with_attachment(email, response, assistant.filepath)
 
     # Process the received JSON data
     return jsonify({"status": "success", "message": "JSON received", "data": data})

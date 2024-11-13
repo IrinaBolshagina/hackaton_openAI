@@ -5,8 +5,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Assistant:
-    def __init__(self, api_key, assistant_name, instructions, model, tools):
+    def __init__(self, api_key, assistant_name, instructions, letter_prompt, model, tools):
         self.client = OpenAI(api_key=api_key)
+        self.letter_prompt = letter_prompt
         self.assistant = self.client.beta.assistants.create(
             name=assistant_name,
             instructions=instructions,
@@ -49,6 +50,23 @@ class Assistant:
             content=message
         )
         return thread
+    
+    def generate_letter(self, job_description, skills):
+        '''
+            Generate a cover letter based on the job description and the CV file.
+        '''
+        final_prompt = f'''
+            Here is the job offer description:
+            {job_description}
+            Here is the required expertises:
+            {skills}
+            {self.letter_prompt}
+        '''
+        # self.add_message_to_thread(thread, final_prompt)
+        thread = self.new_thread_with_file(final_prompt)
+        response = self.run_thread(thread)
+        return response
+
 
     def run_thread(self, thread):
         '''
@@ -68,9 +86,11 @@ class Assistant:
             if file_citation := getattr(annotation, "file_citation", None):
                 cited_file = self.client.files.retrieve(file_citation.file_id)
                 citations.append(f"[{index}] {cited_file.filename}")
-
-        print(message_content.value)
-        print("\n".join(citations))
+        response = message_content.value
+        # print(response)
+        # print("\n!!!!!!!!!!!! Citations!: ".join(citations))
+        # print("\n".join(citations))
+        return response
 
     def chat(self):
         '''
